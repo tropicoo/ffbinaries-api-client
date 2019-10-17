@@ -1,9 +1,11 @@
 from distutils.core import setup
 
+from ffbinaries import __version__ as version
+
 setup(
     name='ffbinaries-api-client',
     packages=['ffbinaries'],
-    version='0.0.1',
+    version=version,
     license='MIT',
     description='ffbinaries api client',
     author='tropicoo',
