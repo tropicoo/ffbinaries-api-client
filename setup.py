@@ -10,7 +10,6 @@ setup(
     description='ffbinaries api client',
     author='tropicoo',
     url='https://github.com/tropicoo/ffbinaries-api',
-    download_url='https://github.com/tropicoo/ffbinaries-api-client/archive/0.0.1.tar.gz',
     keywords=['ffbinaries', 'ffmpeg', 'api'],
     install_requires=['requests'],
     classifiers=[

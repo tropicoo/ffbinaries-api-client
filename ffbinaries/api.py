@@ -9,7 +9,7 @@ import requests
 
 from ffbinaries.cache import SimpleCache
 from ffbinaries.const import HTTP
-from ffbinaries.errors import FFBinariesApiClientError, NoCachedDataError
+from ffbinaries.errors import FFBinariesAPIClientError, NoCachedDataError
 from ffbinaries.utils import retry
 
 BASE_API_URL = 'https://ffbinaries.com/api'
@@ -79,7 +79,7 @@ class FFBinariesAPIClient:
         try:
             return float(self.get_latest_metadata()['version'])
         except (ValueError, KeyError) as err:
-            raise FFBinariesApiClientError('Failed to get latest published'
+            raise FFBinariesAPIClientError('Failed to get latest published'
                                            'version: {0}'.format(err))
 
     def get_available_versions(self):
@@ -88,7 +88,7 @@ class FFBinariesAPIClient:
         try:
             versions_view = metadata['versions'].keys()
         except KeyError as err:
-            raise FFBinariesApiClientError('Failed to get available versions:'
+            raise FFBinariesAPIClientError('Failed to get available versions:'
                                            ' {0}'.format(err))
         for version in versions_view:
             try:
@@ -104,7 +104,7 @@ class FFBinariesAPIClient:
         try:
             url = self.get_latest_metadata()['bin'][platform][component]
         except KeyError as err:
-            raise FFBinariesApiClientError('Failed to download latest version:'
+            raise FFBinariesAPIClientError('Failed to download latest version:'
                                            ' {0}'.format(err))
         return self._request(url, stream=stream)
 
@@ -114,7 +114,7 @@ class FFBinariesAPIClient:
         try:
             url = metadata['bin'][platform][component]
         except KeyError as err:
-            raise FFBinariesApiClientError('Failed to download exact version:'
+            raise FFBinariesAPIClientError('Failed to download exact version:'
                                            ' {0}'.format(err))
         return self._request(url, stream=stream)
 
