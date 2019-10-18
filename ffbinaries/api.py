@@ -31,7 +31,7 @@ class FFBinariesAPIClient:
 
     def __init__(self, use_caching=False, cache_age=CACHE_AGE, log_init=None):
 
-        if callable(log_init[0]):
+        if log_init is not None and callable(log_init[0]):
             log_init[0](log_init[1])
         self._log = logging.getLogger(self.__class__.__name__)
 
