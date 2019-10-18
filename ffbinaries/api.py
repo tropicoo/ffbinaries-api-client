@@ -2,6 +2,8 @@
 
 import logging
 import posixpath
+from multiprocessing import Lock as proc_lock
+from threading import Lock as thread_lock
 
 import requests
 
@@ -20,11 +22,18 @@ ENDPOINT_EXACT_VERSION = '{0}/{{0}}'.format(ENDPOINT_VERSION)
 
 CACHE_AGE = 300
 
+PROC_LOCK = proc_lock()
+THREAD_LOCK = thread_lock()
+
 
 class FFBinariesAPIClient:
     """ffbinaries API Client Class."""
 
-    def __init__(self, use_caching=False, cache_age=CACHE_AGE):
+    def __init__(self, use_caching=False, cache_age=CACHE_AGE, log_init=None):
+
+        if callable(log_init[0]):
+            log_init[0](log_init[1])
+        self._log = logging.getLogger(self.__class__.__name__)
 
         self._use_caching = use_caching
         self._cache = SimpleCache(cache_age)
@@ -34,21 +43,23 @@ class FFBinariesAPIClient:
 
         @retry()
         def __make_request():
+            self._log.debug('%s %s ', method, url)
             response = requests.request(method=method, url=url, stream=stream)
             return response.json() if jsonify else response
 
         # Cache only JSON-data which should be directly returned to the caller.
-        if all([self._use_caching, self._url_is_valid_for_caching(url), jsonify]):
-            try:
-                return self._cache.get(url)
-            except NoCachedDataError:
-                data = __make_request()
-                self._cache.add(url, data)
-                return data
+        if all([self._use_caching, self._valid_for_caching(url), jsonify]):
+            with THREAD_LOCK, PROC_LOCK:
+                try:
+                    return self._cache.get(url)
+                except NoCachedDataError:
+                    data = __make_request()
+                    self._cache.add(url, data)
+                    return data
         return __make_request()
 
     @staticmethod
-    def _url_is_valid_for_caching(url):
+    def _valid_for_caching(url):
         return BASE_API_URL in url
 
     def get_latest_metadata(self, api_ver=DEFAULT_API_VERSION):
