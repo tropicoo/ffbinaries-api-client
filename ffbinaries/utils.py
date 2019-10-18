@@ -3,8 +3,10 @@
 import time
 from functools import wraps
 
+from ffbinaries.errors import FFBinariesApiClientError
 
-def retry(delay=5, retries=3):
+
+def retry(delay=3, retries=3):
     """Retry decorator."""
     retries = retries if retries > 0 else 1
 
@@ -16,10 +18,12 @@ def retry(delay=5, retries=3):
                 try:
                     return func(*args, **kwargs)
                 except Exception as err:
+                    print('Exc %d' % ret)
                     time.sleep(delay)
                     _err = err
             else:
-                raise _err
+                raise FFBinariesApiClientError('Failed to make request: '
+                                               '{0}'.format(_err))
 
         return wrapper
 
