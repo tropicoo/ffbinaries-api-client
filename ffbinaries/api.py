@@ -31,7 +31,7 @@ class FFBinariesAPIClient:
 
     def __init__(self, use_caching=False, cache_age=CACHE_AGE, log_init=None):
 
-        if callable(log_init[0]):
+        if log_init is not None and callable(log_init[0]):
             log_init[0](log_init[1])
         self._log = logging.getLogger(self.__class__.__name__)
 
@@ -100,7 +100,7 @@ class FFBinariesAPIClient:
         versions.sort()
         return versions
 
-    def download_latest_version(self, platform, component, stream=False):
+    def download_latest_version(self, component, platform, stream=False):
         try:
             url = self.get_latest_metadata()['bin'][platform][component]
         except KeyError as err:
@@ -108,7 +108,7 @@ class FFBinariesAPIClient:
                                            ' {0}'.format(err))
         return self._request(url, stream=stream)
 
-    def download_exact_version(self, platform, component, version,
+    def download_exact_version(self, component, version, platform,
                                api_ver=DEFAULT_API_VERSION, stream=False):
         metadata = self.get_exact_version_metadata(version, api_ver)
         try:
