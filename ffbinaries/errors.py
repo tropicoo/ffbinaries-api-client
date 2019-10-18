@@ -1,7 +1,7 @@
 """Exceptions Module."""
 
 
-class FFBinariesApiClientError(Exception):
+class FFBinariesAPIClientError(Exception):
     pass
 
 

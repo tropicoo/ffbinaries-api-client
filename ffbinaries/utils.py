@@ -3,7 +3,7 @@
 import time
 from functools import wraps
 
-from ffbinaries.errors import FFBinariesApiClientError
+from ffbinaries.errors import FFBinariesAPIClientError
 
 
 def retry(delay=3, retries=3):
@@ -22,7 +22,7 @@ def retry(delay=3, retries=3):
                     time.sleep(delay)
                     _err = err
             else:
-                raise FFBinariesApiClientError('Failed to make request: '
+                raise FFBinariesAPIClientError('Failed to make request: '
                                                '{0}'.format(_err))
 
         return wrapper
