@@ -9,7 +9,8 @@ import requests
 
 from ffbinaries.cache import SimpleCache
 from ffbinaries.const import HTTP
-from ffbinaries.errors import FFBinariesAPIClientError, NoCachedDataError
+from ffbinaries.errors import (FFBinariesAPIClientError, NoCacheDataError,
+                               ExpiredCacheDataError)
 from ffbinaries.utils import retry
 
 BASE_API_URL = 'https://ffbinaries.com/api'
@@ -40,23 +41,22 @@ class FFBinariesAPIClient:
 
     def _request(self, url, method=HTTP.GET, stream=False, jsonify=False):
         """General Request Method."""
-
-        @retry()
-        def __make_request():
-            self._log.debug('%s %s ', method, url)
-            response = requests.request(method=method, url=url, stream=stream)
-            return response.json() if jsonify else response
-
         # Cache only JSON-data which should be directly returned to the caller.
-        if all([self._use_caching, self._valid_for_caching(url), jsonify]):
+        if all([jsonify, self._use_caching, self._valid_for_caching(url)]):
             with THREAD_LOCK, PROC_LOCK:
                 try:
                     return self._cache.get(url)
-                except NoCachedDataError:
-                    data = __make_request()
+                except (ExpiredCacheDataError, NoCacheDataError):
+                    data = self.__make_request(url, method, stream, jsonify)
                     self._cache.add(url, data)
                     return data
-        return __make_request()
+        return self.__make_request(url, method, stream, jsonify)
+
+    @retry()
+    def __make_request(self, url, method, stream, jsonify):
+        self._log.debug('%s %s ', method, url)
+        response = requests.request(method=method, url=url, stream=stream)
+        return response.json() if jsonify else response
 
     @staticmethod
     def _valid_for_caching(url):
@@ -77,8 +77,8 @@ class FFBinariesAPIClient:
 
     def get_latest_version(self):
         try:
-            return float(self.get_latest_metadata()['version'])
-        except (ValueError, KeyError) as err:
+            return self.get_latest_metadata()['version']
+        except KeyError as err:
             raise FFBinariesAPIClientError('Failed to get latest published'
                                            'version: {0}'.format(err))
 
@@ -92,12 +92,14 @@ class FFBinariesAPIClient:
                                            ' {0}'.format(err))
         for version in versions_view:
             try:
-                versions.append(float(version))
+                # Check if version can be converted to float but use original
+                # string version for compatibility with API response.
+                float_ver = float(version)
+                versions.append(version)
             except ValueError:
                 # Got regular non-float string e.g. 'latest', skip it.
                 pass
 
-        versions.sort()
         return versions
 
     def download_latest_version(self, component, platform, stream=False):

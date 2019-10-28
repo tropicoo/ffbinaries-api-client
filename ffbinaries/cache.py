@@ -2,7 +2,8 @@
 
 import time
 
-from ffbinaries.errors import InvalidArgumentError, NoCachedDataError
+from ffbinaries.errors import (InvalidArgumentError, NoCacheDataError,
+                               ExpiredCacheDataError)
 
 
 class SimpleCache:
@@ -28,10 +29,7 @@ class SimpleCache:
             if int(time.time()) - self._cache[url][0] < self._cache_age:
                 return self._cache[url][1]
         except KeyError:
-            self.__raise_no_cached_data()
-        del self._cache[url]
-        self.__raise_no_cached_data()
+            raise NoCacheDataError
 
-    @staticmethod
-    def __raise_no_cached_data():
-        raise NoCachedDataError('No cached data')
+        del self._cache[url]
+        raise ExpiredCacheDataError

@@ -18,7 +18,6 @@ def retry(delay=3, retries=3):
                 try:
                     return func(*args, **kwargs)
                 except Exception as err:
-                    print('Exc %d' % ret)
                     time.sleep(delay)
                     _err = err
             else:
