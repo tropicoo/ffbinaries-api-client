@@ -41,7 +41,7 @@ client.show_cache()
 #------------------------------------------------------------------------#
 
 print(client.get_latest_version())
-4.2
+'4.2'
 
 #------------------------------------------------------------------------#
 
@@ -71,7 +71,7 @@ print(client.get_latest_metadata())
 #------------------------------------------------------------------------#
 
 print(client.get_available_versions())
-[3.2, 3.3, 3.4, 4.0, 4.1, 4.2]
+['3.2', '3.3', '3.4', '4.0', '4.1', '4.2']
 
 #------------------------------------------------------------------------#
 
@@ -120,8 +120,8 @@ print(type(x))
 
 #------------------------------------------------------------------------#
 
-z = client.download_exact_version('ffmpeg', '3.3', 'windows-64', stream=True)
-print(type(z))
+x = client.download_exact_version('ffmpeg', '3.3', 'windows-64', stream=True)
+print(type(x))
 <class 'requests.models.Response'>
 
 #------------------------------------------------------------------------#
@@ -189,21 +189,39 @@ Exception Handling
 * `FFBinariesAPIClientError` is raised if something went wrong with API request.
 * `InvalidArgumentError` is raised if `cache_age` arg won't be `float/int` 
 type or less-equal than `0`.
-* `NoCachedDataError` is raised when cache doesn't contain queried data. 
-Currently handled internally and shouldn't be thrown up by API Client. 
+* `NoCacheDataError` is raised when cache doesn't contain queried data
+Currently handled internally and shouldn't be thrown up by API Client
+* `ExpiredCacheDataError` is raised when cached URL data expired
+* `CacheError` is base cache error, previous two inherit from it.
 
 ```python
 class FFBinariesAPIClientError(Exception):
-    """General API Client Exception."""
+    """General API Client Error Class."""
     pass
+
 
 class InvalidArgumentError(ValueError):
     """Invalid Argument Exception."""
     pass
 
-class NoCachedDataError(Exception):
-    """Raised when cache doesn't contain queried data."""
+
+class CacheError(Exception):
+    """Base Cache Error Class."""
     pass
+
+
+class NoCacheDataError(CacheError):
+    """Raised when cache doesn't contain queried data."""
+
+    def __str__(self):
+        return 'No cache data'
+
+
+class ExpiredCacheDataError(CacheError):
+    """Expired Cache Data Error Class."""
+
+    def __str__(self):
+        return 'Expired cache data'
 ```
 
 Third Party Libraries and Dependencies
