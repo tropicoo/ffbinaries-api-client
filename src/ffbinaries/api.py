@@ -13,9 +13,7 @@ from ffbinaries.enums import (
     HTTPMethodType,
     PlatformCodeType,
 )
-from ffbinaries.exceptions import (
-    FFBinariesAPIClientError,
-)
+from ffbinaries.exceptions import FFBinariesAPIClientError
 from ffbinaries.schemas.version import VersionResponseSchema, VersionsResponseSchema
 from ffbinaries.utils import is_float
 
@@ -31,7 +29,6 @@ class FFBinariesV1APIClient:
     ENDPOINT_LATEST: Final[str] = f'{ENDPOINT_VERSION}/latest'
     ENDPOINT_EXACT_VERSION: Final[str] = f'{ENDPOINT_VERSION}/{{}}'
 
-    DEFAULT_CACHE_AGE: Final[int] = 300
     DEFAULT_REQUEST_TIMEOUT: Final[int] = 60
 
     def __init__(self, request_timeout: int = DEFAULT_REQUEST_TIMEOUT) -> None:
@@ -110,6 +107,6 @@ class FFBinariesV1APIClient:
         try:
             url: str = metadata.bin.model_dump()[platform][component]
         except KeyError as err:
-            msg = f'Failed to download exact version: {err}'
+            msg = f'Failed to download exact version "{version}": {err}'
             raise FFBinariesAPIClientError(msg) from err
         return self._request(url=url, stream=stream)

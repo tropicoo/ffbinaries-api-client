@@ -1,6 +1,6 @@
 [project]
 name = "ffbinaries-api-client"
-version = "0.0.20"
+version = "0.0.21"
 description = "FFbinaries API Client"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,8 +19,9 @@ Repository = "https://github.com/tropicoo/ffbinaries-api-client.git"
 Issues = "https://github.com/tropicoo/ffbinaries-api-client/issues"
 
 [dependency-groups]
-lint = [
-    "ruff>=0.9.3",
+dev = [
+    "ruff>=0.11.2",
+    "ty>=0.0.1a19",
 ]
 
 [tool.ruff]
@@ -59,3 +60,25 @@ indent-style = "space"
 quote-style = "single"
 line-ending = "lf"
 docstring-code-format = true
+
+
+[tool.pylint]
+disable = ["all"]
+enable = [
+    "cyclic-import",  # Detect cyclic imports
+    "deprecated-module",         # Detect usage of deprecated modules
+    "import-error",  # Detect missing imports
+    "import-self",               # Detect when a module imports itself
+    "misplaced-future",          # Detect misplaced __future__ imports
+    "no-member",  # Detect undefined attributes in modules/classes
+    "no-name-in-module",  # Detect invalid module attributes
+    "preferred-module",          # Enforce preferred module usage
+    "reimported",                # Detect when a module is reimported
+    "relative-beyond-top-level", # Detect relative imports beyond top level
+    "ungrouped-imports",         # Detect ungrouped imports
+    "unused-import",  # Detect unused imports
+    "wildcard-import",           # Detect wildcard imports
+    "wrong-import-order",        # Detect incorrect import order
+    "wrong-import-position",     # Detect imports not at the top of the file
+]
+ignore-paths = ["venv/", "build/", "dist/", ".venv/"]
