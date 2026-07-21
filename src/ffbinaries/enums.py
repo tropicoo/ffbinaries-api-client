@@ -2,13 +2,12 @@ __all__ = ['APIVersionType', 'ComponentType', 'HTTPMethodType', 'PlatformCodeTyp
 
 
 from enum import StrEnum
-from typing import cast
 
 
 class BaseStrChoiceEnum(StrEnum):
     @classmethod
     def choices(cls) -> tuple[str, ...]:
-        return tuple(cast('str', x.value) for x in cls)
+        return tuple(x.value for x in cls)
 
 
 class HTTPMethodType(BaseStrChoiceEnum):
