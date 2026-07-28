@@ -3,7 +3,7 @@
 __all__ = ['FFBinariesV1APIClient']
 
 import logging
-from typing import ClassVar, Literal
+from typing import ClassVar, Literal, Self
 
 from requests import Response, Session
 
@@ -29,12 +29,28 @@ class FFBinariesV1APIClient:
     ENDPOINT_LATEST: ClassVar[str] = f'{ENDPOINT_VERSION}/latest'
     ENDPOINT_EXACT_VERSION: ClassVar[str] = f'{ENDPOINT_VERSION}/{{}}'
 
-    DEFAULT_REQUEST_TIMEOUT: ClassVar[int] = 60
+    DEFAULT_REQUEST_TIMEOUT: ClassVar[float] = 60.0
 
-    def __init__(self, request_timeout: int = DEFAULT_REQUEST_TIMEOUT) -> None:
+    def __init__(
+        self,
+        session: Session | None = None,
+        request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
+    ) -> None:
         self._log = logging.getLogger(self.__class__.__name__)
         self._request_timeout = request_timeout
-        self._session = Session()
+        self._session = session or Session()
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.close_session()
+
+    def __del__(self) -> None:
+        self.close_session()
+
+    def close_session(self) -> None:
+        self._session.close()
 
     def get_latest_metadata(self) -> VersionResponseSchema:
         return VersionResponseSchema.model_validate_json(
@@ -91,11 +107,16 @@ class FFBinariesV1APIClient:
         url: str,
         method: HTTPMethodType = HTTPMethodType.GET,
         stream: bool = False,
+        **kwargs,  # noqa: ANN003
     ) -> Response:
         """General Request Method."""
-        self._log.debug('%s %s ', method, url)
+        self._log.debug('%s %s', method, url)
         return self._session.request(
-            method=method, url=url, stream=stream, timeout=self._request_timeout
+            method=method,
+            url=url,
+            stream=stream,
+            timeout=self._request_timeout,
+            **kwargs,
         )
 
     def _valid_for_caching(self, url: str) -> bool:

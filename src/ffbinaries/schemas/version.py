@@ -1,9 +1,11 @@
+from abc import ABC
+
 from pydantic import BaseModel, Field
 
 from ffbinaries.enums import PlatformCodeType
 
 
-class ComponentSchema(BaseModel):
+class BaseComponentSchema(BaseModel, ABC):
     ffmpeg: str | None = Field(
         default=None,
         description='FFmpeg binary ZIP archive URL',
@@ -34,35 +36,35 @@ class ComponentSchema(BaseModel):
     )
 
 
-class Windows32Schema(ComponentSchema):
+class Windows32Schema(BaseComponentSchema):
     pass
 
 
-class Windows64Schema(ComponentSchema):
+class Windows64Schema(BaseComponentSchema):
     pass
 
 
-class Linux32Schema(ComponentSchema):
+class Linux32Schema(BaseComponentSchema):
     pass
 
 
-class Linux64Schema(ComponentSchema):
+class Linux64Schema(BaseComponentSchema):
     pass
 
 
-class LinuxArmhfSchema(ComponentSchema):
+class LinuxArmhfSchema(BaseComponentSchema):
     pass
 
 
-class LinuxArmelSchema(ComponentSchema):
+class LinuxArmelSchema(BaseComponentSchema):
     pass
 
 
-class LinuxArm64Schema(ComponentSchema):
+class LinuxArm64Schema(BaseComponentSchema):
     pass
 
 
-class Osx64Schema(ComponentSchema):
+class Osx64Schema(BaseComponentSchema):
     pass
 
 

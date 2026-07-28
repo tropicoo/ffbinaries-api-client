@@ -31,9 +31,7 @@ client.get_available_versions()
 client.get_available_versions_metadata()
 client.get_exact_version_metadata(version='6.1')
 client.download_latest_version(
-    component=ComponentType.FFMPEG,
-    platform=PlatformCodeType.WIN64,
-    stream=True
+    component=ComponentType.FFMPEG, platform=PlatformCodeType.WIN64, stream=True
 )
 client.download_exact_version(
     component=ComponentType.FFMPEG,
@@ -41,7 +39,6 @@ client.download_exact_version(
     platform=PlatformCodeType.WIN64,
     stream=True,
 )
-
 ```
 
 Examples located in `examples` directory.
@@ -53,6 +50,7 @@ Exception Handling
 ```python
 class FFBinariesAPIClientError(Exception):
     """General API Client Error Class."""
+
     pass
 ```
 
@@ -61,4 +59,4 @@ Third Party Libraries and Dependencies
 The following libraries will be installed when you install the client library:
 
 * [Requests](https://requests.readthedocs.io/en/latest/)
-* [Pydantic](https://docs.pydantic.dev/latest/)
+* [Pydantic](https://pydantic.dev/docs/)
